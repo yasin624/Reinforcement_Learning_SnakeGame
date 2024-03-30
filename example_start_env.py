@@ -1,7 +1,18 @@
+"""
+
+
+Oyun için örnek çalıştırma ve deneme dosyası.
+
+Example execution and testing file for the game.
+
+
+"""
+
+
+
 from snake_env import snake_game
 import numpy as np
 
-import time
 env =snake_game(render_mode="human")
 
 

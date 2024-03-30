@@ -1,147 +1,67 @@
 
 import gym
-
 from gym import spaces
 import numpy as np
 import cv2
-import random
-import time
-from collections import  deque
-from tqdm import tqdm
+from snake_game import snake_game
 
 
+print("version 40")
 
-ARENA_size=(500, 500, 3)
-ARENA_MASK_size=np.array((500, 500, 1),dtype=np.int32)
-OBJ_SİZE=10
-SİZE=(ARENA_MASK_size[:2]/OBJ_SİZE).astype("int32")
-
-class snake_game(gym.Env):
+class ENV(gym.Env):
 
     def __init__(self,render_mode="human",Sk=1.55,Pk=0.1,Tk=0.1,Rk=1.1):
-        super(snake_game,self).__init__()
+        super(gym.Env,self).__init__()
         
-        self.Sk=Sk
-        self.Pk=Pk
-        self.Tk=Tk
-        self.Rk=Rk
-        
-        self.action_space=spaces.Discrete(4)   # seçim yapabilme değeri
-        self.observation_space=spaces.Box(low=-ARENA_size[0],high=ARENA_size[1],shape=(7+(80*80),),dtype=np.float32)
+        self.Game=snake_game()
 
-        self.render_mode=render_mode
+        self.action_space=spaces.Discrete(4)   # seçim yapabilme değeri
+        self.observation_space=spaces.Box(low=-self.Game._snake_game__Arene_Size[0],high=self.Game._snake_game__Arene_Size[1],shape=(7+(52*52),),dtype=np.float32)
+
+        self.Game.render_mode=render_mode
+
+        self.ARENA_MASK_size=np.array((500, 500, 1),dtype=np.int32)
     def step(self,Action):
         step_reward=0
-        if self.render_mode=="human":
-            self.img = np.zeros(ARENA_size, dtype='uint8')
-            font = cv2.FONT_HERSHEY_SIMPLEX
-
-            info=np.zeros((50,self.img.shape[1],self.img.shape[2]))
-            info[:,:]=[54,54,54]
-            cv2.putText(info, 'ScoreQ : {}  |'.format(self.score), (50, 30), font, 1, (0, 255, 0),2, cv2.LINE_AA)
-            cv2.putText(info, '   Action : {}'.format(Action), (270, 30), font, 1, (0, 255,0),2, cv2.LINE_AA)
-            
-            # Display Apple
-            cv2.rectangle(self.img, (self.apple_position[0], self.apple_position[1]), (self.apple_position[0] + OBJ_SİZE, self.apple_position[1] + OBJ_SİZE),
-                          (246, 160, 180), -1)
-
-            # Display Snake
-            for position in self.snake_position:
-                font = cv2.FONT_HERSHEY_SIMPLEX
-                cv2.rectangle(self.img, (position[0], position[1]), (position[0] + OBJ_SİZE, position[1] + OBJ_SİZE), (0, 255, 0), -1)
-                cv2.rectangle(self.img, (position[0], position[1]), (position[0] + OBJ_SİZE, position[1] + OBJ_SİZE), (0, 0, 0), 2)
-                
-            img_info=np.concatenate([info,self.img])
-            cv2.imshow('my_denek', img_info)
-            cv2.waitKey(100)
-            
+        self.Game.render()
 
 
-        
-        
+        self.Game.Action=Action
+        self.Game.Move()
 
-       
-
-
-        # Change the head position based on the button direction
-        if Action == 1:
-            self.snake_head[0] += OBJ_SİZE
-        elif Action == 0:
-            self.snake_head[0] -= OBJ_SİZE
-        elif Action == 2:
-            self.snake_head[1] += OBJ_SİZE
-        elif Action == 3:
-            self.snake_head[1] -= OBJ_SİZE
-
-
-        
         # Increase Snake length on eating apple
-        if self.snake_head == self.apple_position:
-            self.apple_position, self.score = self.collision_with_apple(self.apple_position, self.score)
-            self.snake_position.insert(0, list(self.snake_head))
-            
-            
-
-            self.pased=True
-
-        else:
-            self.snake_position.insert(0, list(self.snake_head))
-            self.snake_position.pop()
-
+        self.Game.collision_with_apple()
 
         # On collision kill the snake and print the score
-        if self.collision_with_boundaries(self.snake_head) == 1 or self.collision_with_self(self.snake_position) == 1:
-            self.done=True
-
+        self.Game.collision_with_boundaries()
+        self.Game.collision_with_self()
+        
 
 
         # ÖDÜL VEYA CEVA DEĞERLERİ
-        Sx = self.snake_head[0]
-        Sy = self.snake_head[1]
-        Deltax = self.apple_position[0]-Sx
-        Deltay = self.apple_position[1]-Sy
-        S_leng = len(self.snake_position) 
-        new_calculation=self.calculate_distance(self.snake_head, self.apple_position)
+        Sx = self.Game.snake_head[0]
+        Sy = self.Game.snake_head[1]
+        Deltax = self.Game.apple_position[0]-Sx
+        Deltay = self.Game.apple_position[1]-Sy
+        S_leng = len(self.Game.snake_position)
+        new_calculation=self.calculate_distance(self.Game.snake_head, self.Game.apple_position)
 
 
-
-        """
-        # ÖDÜLLER
-        if self.past_calculation>new_calculation:  # yakınlasırsa
-            step_reward+=1
-            self.past_calculation="""
-
-        if self.pased:                             # elma yerse
-            step_reward=50
-        
-        """
-        # CEZALAR 
-        if self.past_calculation<new_calculation:  # yakınlasırsa
-            step_reward-=1
-            self.past_calculation=new_calculation
-        
-
-        if (self.max_frame+5)<self.step_frame and self.pased: 
-            step_reward-=5
-        """
-        if self.done:
-            reward=-10
-        
+        if self.Game.pased:                             # elma yerse
+            step_reward=self.Game.score*10
 
 
 
         """step_total=((S_leng*10)+step_reward)/100"""
 
-        step_total = (self.sigmoid(new_calculation)*10+self.sigmoid(self.step_frame)*10 + step_reward)/100
+        reward=((250-new_calculation)/100+step_reward)/100
 
         
-        reward=step_total
-
-
-
-
+        if self.Game.done:
+            reward=-((500*500)-len(self.Game.snake_position))/1000
 
         """
+        
         # ÖDÜLLER
         if reward>self.prev_reward:  # daha iyi
             reward+=2
@@ -161,34 +81,31 @@ class snake_game(gym.Env):
         print(" reward : ",reward)"""
 
         
-        img=self.make_mask(ARENA_MASK_size,self.snake_position,self.apple_position,show=False)
+        img=self.make_mask(self.ARENA_MASK_size,self.Game.snake_position,self.Game.apple_position,show=False,resize=(50,50))
 
-        squart=self.get_squart(img,self.snake_head,(80,80)).reshape(-1).reshape(80,80)
+        squart=self.get_squart_v2(img).reshape(-1)
 
         #for s,i in enumerate(squart):
         #    print(i)
-        cv2.imshow("Gorus_Acisi",squart)
-        cv2.waitKey(1)
+        #cv2.imshow("Gorus_Acisi",squart)
+        #cv2.waitKey(1)
         #time.sleep(1)
         #input("devam için enterlayın")
 
         
 
 
-        self.step_frame+=1
+        self.Game.step_frame+=1
 
-        if self.pased:                             # elma yerse
-            self.pased=False
-            self.step_frame=0
-            self.past_calculation=new_calculation
-            self.max_frame=ARENA_size[0]
-            self.prev_reward=0
-            self.prev_kazanc=0
+        if self.Game.pased:                             # elma yerse
+            self.Game.reset_pased()
+            self.past_calculation = new_calculation
+
         
             
          
 
-        obs = np.array([Sx,Sy,Deltax,Deltay,S_leng,self.step_frame,new_calculation],dtype=np.float32)
+        obs = np.array([Sx,Sy,Deltax,Deltay,S_leng,self.Game.step_frame,new_calculation],dtype=np.float32)
 
         self.observation =np.append(obs,squart)#[-1 for i in range(SNAKE_LEN_GOAL)]a
         #print(" info size : ",deneme.shape)
@@ -196,42 +113,34 @@ class snake_game(gym.Env):
         
 
 
-        return  self.observation,np.array(reward,dtype=np.float32),np.array(self.done,dtype=np.float32)
+        return  self.observation,np.array(reward,dtype=np.float32),np.array(self.Game.done,dtype=np.float32),{}
 
 
 
 
 
     def reset(self):
-        self.done=False
+        self.Game.reset()
 
-        self.snake_head = [int(ARENA_size[0]/2),int(ARENA_size[1]/2)]
-        self.snake_position = [[int(ARENA_size[0]/2),int(ARENA_size[1]/2)],[self.snake_head[0]-OBJ_SİZE,self.snake_head[1]],[self.snake_head[0]-(OBJ_SİZE*2),self.snake_head[1]]]
-        self.apple_position = [int(random.randrange(1,ARENA_size[0]/10)*10),int(random.randrange(1,ARENA_size[1]/10)*10)]
-
-        self.score = 0
-        self.prev_reward=0
-        self.past_calculation=self.calculate_distance(self.snake_head,self.apple_position)
-        self.step_frame=0
-        self.max_frame=ARENA_size[0]
-        self.pased=False
-        self.prev_kazanc=0
-
+        snake_head=self.Game.snake_head
+        snake_position=self.Game.snake_position
+        apple_position=self.Game.apple_position
 
         # OBS degerleri
-        Sx=self.snake_head[0]
-        Sy = self.snake_head[1]
-        Deltax = self.apple_position[0]-Sx
-        Deltay = self.apple_position[1]-Sy
-        S_leng=len(self.snake_position)
+        Sx=snake_head[0]
+        Sy = snake_head[1]
+        Deltax = apple_position[0]-Sx
+        Deltay = apple_position[1]-Sy
+        S_leng=len(snake_position)
 
+        self.past_calculation = self.calculate_distance(snake_head, apple_position)
         
 
-        img=self.make_mask(ARENA_MASK_size,self.snake_position,self.apple_position,show=False)
-        squart=self.get_squart(img,self.snake_head,(80,80)).reshape(-1)
+        img=self.make_mask(self.ARENA_MASK_size,snake_position,apple_position,show=False,resize=(50,50))
+        squart=self.get_squart_v2(img,show=False).reshape(-1)
 
 
-        obs = np.array([Sx,Sy,Deltax,Deltay,S_leng,self.step_frame,self.past_calculation],dtype=np.float32)
+        obs = np.array([Sx,Sy,Deltax,Deltay,S_leng,self.Game.step_frame,self.past_calculation],dtype=np.float32)
         self.observation =np.append(obs,squart)#[-1 for i in range(SNAKE_LEN_GOAL)]a
 
 
@@ -242,21 +151,22 @@ class snake_game(gym.Env):
         img =np.array(img,dtype="float32")
         img[img[:,:]==255] = 1
 
-        img[img[:,:]==100] = 1
+        img[img[:,:]==200] = 0.5
+
+        img[img[:,:]==100] = -1
 
         img[img[:,:]==0] = 0
 
         mask=np.zeros((img.shape[0]+2,img.shape[1]+2,1))
-        mask[:,:]= 1
+        mask[:,:]= -1
 
         mask[1:-1,1:-1]=img
 
 
 
         if show:
-            cv2.rectangle(img, (start_point[0] - size[0], start_point[1] - size[0]),
-                               (start_point[0] + size[0], start_point[1] + size[0]),
-                          255, 1)
+            cv2.imshow("deneme",mask)
+            cv2.waitKey(200)
 
 
         return mask.astype(np.float32)
@@ -264,19 +174,25 @@ class snake_game(gym.Env):
     def make_mask(self,size,obje_array,target,show=False,resize=False):
         img = np.zeros(size, dtype='uint8')
         # Display Snaexit
-        cv2.rectangle(img, (target[0], target[1]), (target[0] + OBJ_SİZE, target[1] + OBJ_SİZE),255, -1)
+        cv2.rectangle(img, (target[0], target[1]), (target[0] + self.Game._snake_game__OBJ_SİZE, target[1] + self.Game._snake_game__OBJ_SİZE),255, -1)
+
+        
 
         for position in obje_array:
             position=np.array(position,dtype=np.int32)
             font = cv2.FONT_HERSHEY_SIMPLEX
 
-            cv2.rectangle(img, (position[0], position[1]), (position[0] + OBJ_SİZE, position[1] + OBJ_SİZE),100, -1)
+            cv2.rectangle(img, (position[0], position[1]), (position[0] + self.Game._snake_game__OBJ_SİZE, position[1] + self.Game._snake_game__OBJ_SİZE),100, -1)
 
-        if resize: img=cv2.resize(img,SİZE).reshape(SİZE[0],SİZE[1],1)
+        #snake_head
+        snake_head=obje_array[0]
+        cv2.rectangle(img, (snake_head[0],snake_head[1]), (snake_head[0] + self.Game._snake_game__OBJ_SİZE,snake_head[1] + self.Game._snake_game__OBJ_SİZE), 200, -1)
+
+
+        if resize: img=cv2.resize(img,resize).reshape(resize[0],resize[1],1)
 
         if show: 
             cv2.imshow("gozlemci_haritası",img)
-
         return img
 
     def sigmoid(self,x):
@@ -304,23 +220,6 @@ class snake_game(gym.Env):
         """
         distance = np.sqrt(((point2[0] - point1[0]) ** 2)+((point2[1] - point1[1]) ** 2))
         return distance
-    def collision_with_apple(self,apple_position, score):
-        apple_position = [random.randrange(1,int(ARENA_size[0]/OBJ_SİZE))*10,random.randrange(1,int(ARENA_size[0]/OBJ_SİZE))*10]
-        score += 1
-        return apple_position, score
-
-    def collision_with_boundaries(self,snake_head):
-        if snake_head[0]>=ARENA_size[0] or snake_head[0]<0 or snake_head[1]>=ARENA_size[1] or snake_head[1]<0 : #duvara çarparsa
-            return 1
-        else:
-            return 0
-
-    def collision_with_self(self,snake_position):   # kuyruğuna çarparsa
-        snake_head = snake_position[0]
-        if snake_head in snake_position[1:]:
-            return 1
-        else:
-            return 0
 
     def get_squart(self,img,start_point,size,show=False,resize=False):
 
@@ -330,9 +229,12 @@ class snake_game(gym.Env):
         y2=start_point[1] + size[1]
         x1=start_point[0] - size[0]
         x2=start_point[0] + size[0]
+        print(" x1,x2,y1,y2 : ",x1,x2,y1,y2)
 
         iw,ih,_=img.shape
         x1_c,x2_c,y1_c,y2_c=0,size[0]*2,0,size[0]*2
+
+        print("  x1_c,x2_c,y1_c,y2_c : ", x1_c,x2_c,y1_c,y2_c)
         if x1<0:
             x1_c=x1
             x1=0
@@ -344,17 +246,18 @@ class snake_game(gym.Env):
         if y2>ih:
             y2_c=(size[1]*2)-(y2-ih)
 
+        print(" x1,x2,y1,y2 : ",x1,x2,y1,y2)
         squart=img[y1:y2,
                    x1:x2]
 
-
+        print(" squart : ",squart.shape)
         squart =np.array(squart,dtype="float32")
-        squart[squart[:,:]==255] = 1
+        squart[squart[:,:]==255] = 2
+        squart[squart[:,:]==200] = 1
 
         squart[squart[:,:]==100] = -1
-
         squart[squart[:,:]==0] = 0
-
+        print(" squart : ",squart.shape)
 
 
 
@@ -362,6 +265,8 @@ class snake_game(gym.Env):
         mask[:,:]=-1
 
         mw,mh,_=mask.shape
+
+        print("mask : ",mask.shape," img :",img.shape, " squart : ",squart.shape)
         """
         print("mask_shape : ",mask.shape)
                                 print("Squar_shape : ",squart.shape)
@@ -371,17 +276,20 @@ class snake_game(gym.Env):
         print("artıklar x1,x2,y1,y2 : ",x1_c,x2_c,y1_c,y2_c)
         print("kare_dagılımı : ",abs(min(y1_c,0)),":",abs(min(mh,y2_c)),abs(min(x1_c,0)),":",abs(min(mw,x2_c)))
                         """
-        mask[abs(min(y1_c,0)):abs(min(mh,y2_c)),abs(min(x1_c,0)):abs(min(mw,x2_c))]=squart
+        try:
+
+            mask[abs(min(y1_c,0)):abs(min(mh,y2_c)),abs(min(x1_c,0)):abs(min(mw,x2_c))]=squart
+        except:
+            mask[:,:]=squart
 
 
-        
         if show:
             cv2.rectangle(img, (start_point[0] - size[0], start_point[1] - size[0]),
                                (start_point[0] + size[0], start_point[1] + size[0]),
                           255, 1)
 
 
-        if resize: 
+        if resize:
             mask=cv2.resize(mask,(10,10)).reshape(10,10,1)
 
 
