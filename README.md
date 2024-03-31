@@ -129,8 +129,38 @@ Reward değerinin optimizasyonu için ilk başta basitleştirilip daha sonraki e
 
 <i>The optimization of the reward value can be facilitated by initially simplifying it and gradually making it more complex in subsequent trainings, making learning easier. From my experiences, I have found that a reward system that initially aims only to approach the apple allows for quicker finding of a path and survival, while a system that learns to eat the apple in subsequent trainings, gaining more points for doing so, facilitates faster learning. To accelerate apple consumption later on, the distance from the snake to the apple is added to the sigmoid function at each step, giving a maximum reward of +1 when approaching the apple and at least +0 when moving away, ensuring a higher reward. Therefore, I have concluded that this approach leads to more successful training.</i>
 
-<img src="file/reward2.png" align="left" width="100%"  height="100%" > </img>
-<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+<div>  
+<img src="./file/video/snake_vs3.gif"  width="50%" > </img>
+<pre >
+<pre>
+
+<pre>
+# Increase Snake length on eating apple
+def collision_with_apple(self):
+        if self.snake_head == self.apple_position:
+            self.score+=1
+            self.pased = True
+            return True
+
+</pre>
+<pre>
+self.Game.collision_with_apple():
+if self.Game.pased:                            
+    step_reward=self.Game.score*10
+</pre>
+<pre>
+reward=((250-new_calculation)/100+step_reward)/100
+</pre>
+<pre>
+if self.done:
+    reward=-(((50*50)-len(self.snake_position))/100)
+    #(max snake body - snake body) 100
+</pre>
+</pre>
+</div>
+
+
+<br/><br/><br/>
 
 ### **RUN : ÇALIŞTIRMAK**
 <hr width="190px"  align="left">
