@@ -1,0 +1,8 @@
+gym==0.24.0
+collections
+opencv-python==4.8.1.78
+tqdm==4.66.1
+numpy==4.66.1
+stable_baselines3==2.2.1
+json5==0.9.14
+keyboard
