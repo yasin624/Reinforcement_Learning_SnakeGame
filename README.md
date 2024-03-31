@@ -81,16 +81,26 @@
 
 <br/>
 
-<p >Proje kapsamında, PPO optimizasyon algoritması, verilen politikayı güncelleyerek yılanın görevi başarılı bir şekilde tamamlamasını sağlamaktadır. Bu görev için belirlenen politika parametreleri şunlardır: "Sx, Sy" (yılanın başının konumu), "deltax, deltay" (elmaya olan x ve y delta uzaklıkları), "S_len" (yılanın toplam uzunluğu), "Reward" (yılanın aldığı ödül), "Field_view" (yılanın görüş alanı) ve "observation" (çalışma ortamının boyutu). PPO, bu parametreleri kullanarak politikayı günceller ve optimizasyon algoritması aracılığıyla Q-tablo değerini günceller.</p>
+<p >
+Projenin kapsamında, PPO optimizasyon algoritması, verilen politikayı güncelleyerek yılanın görevi başarılı bir şekilde tamamlamasını sağlamaktadır. Bu görev için belirlenen politika MlpPolicy'dir ve politika parametreleri olarak şunlar yer almaktadır: "Sx, Sy" (yılanın başının konumu), "deltax, deltay" (elmayla olan x ve y delta uzaklıkları), "S_len" (yılanın toplam uzunluğu), "Reward" (yılanın aldığı ödül), "Field_view" (yılanın görüş alanı) ve "observation" (çalışma ortamının boyutu). PPO, bu parametreleri kullanarak MlpPolicy politikası üzerinde optimizasyon sağlayarak gradyan değerlerinin maksimize edilmesini sağlayacaktır, bu sayede en uygun hareket değerini bize verecektir.</p>
 
-<i>Within the scope of the project, the PPO optimization algorithm updates the given policy to ensure the successful completion of the snake's task. The policy parameters for this task include "Sx, Sy" (the position of the snake's head), "deltax, deltay" (the x and y delta distances to the apple), "S_len" (the total length of the snake), "Reward" (the reward received by the snake while attempting the task), "Field_view" (the snake's field of view), and "observation" (the size of the environment in which the snake performs the task). PPO updates these values through its policy and updates the Q-table value through the optimization algorithm.</i>
+<i>In the scope of the project, the PPO optimization algorithm updates the given policy to ensure the snake completes the task successfully. The policy designated for this task is MlpPolicy, with the following policy parameters: "Sx, Sy" (the snake's head position), "deltax, deltay" (x and y delta distances to the apple), "S_len" (total length of the snake), "Reward" (reward received by the snake), "Field_view" (snake's field of view), and "observation" (size of the environment). PPO optimizes the MlpPolicy by using these parameters, maximizing the gradient values, thereby providing us with the most suitable action value.</i>
 
 <br/>
 
 ### **REWARD : ÖDÜl**
 <hr width="190px"  align="left">
+
+<br/>
+
+<p > 
+Pekiştirmeli öğrenme algoritmalarında, algoritmanın optimizasyon fonksiyonları diğer algoritmalar dan farklı olarak minimize yerine maximize etmeyi hedefler ve bunun için reward (ödül) parametresini kullanır. Bu değer, görevin maximize edici parametresidir. Görevin doğruluğu, ödül değerinin yüksek olması ile doğru orantılıdır. Ödül ne kadar yüksekse, görevin doğruluğu da o kadar yüksek olur; ancak unutulmaması gereken, ödül sisteminin doğru olmasıdır. Ödül sistemi, görevin başarısız olma yönünde eğimliyse o zaman görev başarısızlıkla sonuçlanır. Ödül sistemi, olabildiğince sade ve minimize edilirse, öğrenme o kadar hızlı ve doğru olacaktır.</p>
+
+<i>In reinforcement learning algorithms, the optimization functions of the algorithm aim to maximize instead of minimizing, unlike other algorithms, and they use the reward parameter for this purpose. This value is the maximizing parameter of the task. The accuracy of the task is directly proportional to the high reward value. The higher the reward, the higher the accuracy of the task; however, it should be noted that the reward system must be correct. If the reward system is inclined towards task failure, then the task will result in failure. The reward system, when kept as simple as possible and minimized, leads to faster and more accurate learning.</i>
+
+<br/>
 <div>  
-    <img src="./file/video/snake_vs1.webp"  width="50%" > </img>
+    <img src="./file/video/snake_vs1.gif"  width="50%" > </img>
     <pre >
 
     #on eating apple
@@ -101,33 +111,39 @@
     </pre>
 </div>
 
-<br/>
-
 <p > 
-Pekiştirmeli öğrenme algoritmalarında, algoritmanın optimizasyon fonksiyonları diğer algoritmalar dan farklı olarak minimize yerine maximize etmeyi hedefler ve bunun için reward (ödül) parametresini kullanır. Bu değer, görevin maximize edici parametresidir. Görevin doğruluğu, ödül değerinin yüksek olması ile doğru orantılıdır. Ödül ne kadar yüksekse, görevin doğruluğu da o kadar yüksek olur; ancak unutulmaması gereken, ödül sisteminin doğru olmasıdır. Ödül sistemi, görevin başarısız olma yönünde eğimliyse o zaman görev başarısızlıkla sonuçlanır. Ödül sistemi, olabildiğince sade ve minimize edilirse, öğrenme o kadar hızlı ve doğru olacaktır.</p>
+Reward değerinin optimizasyonu için ilk başta basitleştirilip daha sonraki eğitimlerde yavaş yavaş karmaşıklaştırılması, öğrenmeyi daha kolay hale getirebilir. Deneyimlerimden anladığım kadarıyla, ilk başta sadece elmaya yakınlaşmayı hedefleyen bir ödül sistemi, daha hızlı bir yol bulmayı ve hayatta kalmayı sağlarken, sonraki eğitimlerde elmayı yemesi durumunda daha fazla puan kazanacağını öğrenen bir sistem daha hızlı öğrenmeyi kolaylaştırmaktadır.
+</p>
 
-<i>In reinforcement learning algorithms, the optimization functions of the algorithm aim to maximize instead of minimizing, unlike other algorithms, and they use the reward parameter for this purpose. This value is the maximizing parameter of the task. The accuracy of the task is directly proportional to the high reward value. The higher the reward, the higher the accuracy of the task; however, it should be noted that the reward system must be correct. If the reward system is inclined towards task failure, then the task will result in failure. The reward system, when kept as simple as possible and minimized, leads to faster and more accurate learning.</i>
-
-<br/>
+<i>The optimization of the reward value can be facilitated by initially simplifying it and gradually making it more complex in subsequent trainings, making learning easier. From my experiences, I have found that a reward system that initially aims only to approach the apple allows for quicker finding of a path and survival, while a system that learns to eat the apple in subsequent trainings, gaining more points for doing so, facilitates faster learning. 
+</i>
 
 <div>  
-    <img src="./file/video/snake_vs1.webp"  width="50%" > </img>
+    <img src="./file/video/snake_vs2.gif"  width="50%" > </img>
     <pre >
     <pre>
     new_calculation=self.calculate_distance(self.snake_head, self.apple_position)
-    reward=((255-new_calculation)+eat_eppale)/100
+    reward_scor=(self.score/self.total_aple)
+    reward_calculation=self.sigmoid(new_calculation)
+    reward_time=self.sigmoid(self.step_frame)
+
+    reward_extra_apple=step_reward
+
+    step_total = reward_scor+reward_calculation+reward_time+step_reward
+    reward=step_total
     <pre>
     if self.done:
-        reward=-(((50*50)-len(self.snake_position))/100)
+        reward=-10
         #(max snake body - snake body) 100
     </pre></pre>
 </div>
 
-
 <p > 
-Reward değerinin optimizasyonu için ilk başta basitleştirilip daha sonraki eğitimlerde yavaş yavaş karmaşıklaştırılması, öğrenmeyi daha kolay hale getirebilir. Deneyimlerimden anladığım kadarıyla, ilk başta sadece elmaya yakınlaşmayı hedefleyen bir ödül sistemi, daha hızlı bir yol bulmayı ve hayatta kalmayı sağlarken, sonraki eğitimlerde elmayı yemesi durumunda daha fazla puan kazanacağını öğrenen bir sistem daha hızlı öğrenmeyi kolaylaştırmaktadır. Daha sonra elma yemesini hızlandırmak için her adımda yılandan elmaya olan uzaklığın sigmoid fonksiyonuna eklenerek, elmaya yaklaşma durumunda en fazla +1, uzaklaştığında ise en az +0 puan verilerek ödülün daha yüksek olması sağlanmıştır. Dolayısıyla, bu şekilde eğitimin daha başarılı olacağı kanaatine vardım.</p>
+ Daha sonra elma yemesini hızlandırmak için her adımda yılandan elmaya olan uzaklığın sigmoid fonksiyonuna eklenerek, elmaya yaklaşma durumunda en fazla +1, uzaklaştığında ise en az +0 puan verilerek ödülün daha yüksek olması sağlanmıştır. Dolayısıyla, bu şekilde eğitimin daha başarılı olacağı kanaatine vardım.</p>
 
-<i>The optimization of the reward value can be facilitated by initially simplifying it and gradually making it more complex in subsequent trainings, making learning easier. From my experiences, I have found that a reward system that initially aims only to approach the apple allows for quicker finding of a path and survival, while a system that learns to eat the apple in subsequent trainings, gaining more points for doing so, facilitates faster learning. To accelerate apple consumption later on, the distance from the snake to the apple is added to the sigmoid function at each step, giving a maximum reward of +1 when approaching the apple and at least +0 when moving away, ensuring a higher reward. Therefore, I have concluded that this approach leads to more successful training.</i>
+<i>
+To accelerate apple consumption later on, the distance from the snake to the apple is added to the sigmoid function at each step, giving a maximum reward of +1 when approaching the apple and at least +0 when moving away, ensuring a higher reward. Therefore, I have concluded that this approach leads to more successful training.</i>
+
 
 <div>  
 <img src="./file/video/snake_vs3.gif"  width="50%" > </img>
@@ -159,40 +175,73 @@ if self.done:
 </pre>
 </div>
 
+<p > Son olarak, yılanın elma yemesini teşvik etmek ve kendini engellemesini önlemek için her elma yeme olayına bağlı olarak ödülleri lineer olarak artırırken, cezalandırma sistemini de her elma yeme olayında azaltan bir ödül sistemine geçildi. Bu sayede her zaman yılanın elma yemesi teşvik edilmektedir.</p>
 
-<br/><br/><br/>
+<i>
+Finally, a reward system was implemented where rewards for eating an apple increase linearly, and the punishment system decreases for each apple eaten, aiming to incentivize apple consumption and discourage self-blocking actions.</i>
 
 ### **RUN : ÇALIŞTIRMAK**
 <hr width="190px"  align="left">
 <br/>
 
-### **Requireds : Gereklilikler**
-<pre>
-pip install gym==0.24.0
-pip install collections
-pip install opencv-python==4.8.1.78
-pip install tqdm==4.66.1
-pip install numpy==4.66.1
-pip install stable_baselines3==2.2.1
-pip install json5==0.9.14
 
+<p >
+Projenin çalıştırılması için sisteminizde Python 3 yorumlayıcısı bulunması gerekmektedir.</p>
+
+<i>For running the project, your system needs to have the Python version 3 interpreter.</i>
+
+### **Requireds : Gereklilikler**
+<p >
+Proje kapsamında gereken kütüphaneleri projenin dizininde bulunan requirements.txt dosyasındaki kütüphaneleri yüklemek için aşağıdaki komutu kullanarak otomatik olarak yükleyiniz;
+
+</p>
+
+<i>In the scope of the project, install the necessary libraries by running the following command in the project directory to automatically install the libraries listed in the requirements.txt file;</i>
+
+<pre>
+pip install -r requirements.txt
 </pre>
 <br/>
 
-<p > Proje içinde dört dosya bulunmaktadır. Bunlar snake_env.py (oyun dosyası), snake_train.py (eğitim dosyası), pred.py (tahmin dosyası) ve start_env.py (manuel oynama) dosyalarıdır. Projeyi çalıştırmak için;</p>
+<p > Proje içinde dört dosya bulunmaktadır. Bunlar snake_env.py (oyun dosyası), snake_train.py (eğitim dosyası), pred.py (tahmin dosyası) ve manuel_game.py (manuel oynama) dosyalarıdır. Projeyi çalıştırmak için;</p>
 
-<i>There are four files in the project. These are snake_env.py (game file), snake_train.py (training file), pred.py (prediction file), and start_env.py (manual playing file). To run the project;</i>
+<i>There are four files in the project. These are snake_env.py (game file), snake_train.py (training file), pred.py (prediction file), and manuel_game.py (manual playing file). To run the project;</i>
 
 **LİNUX**
 <hr width="190px"  align="left">
 
 <pre>
-python3 pred.py 
+python3 snake_train.py # for training 
 </pre>
+<pre>
+python3 pred.py # for prediction 
+</pre>
+<pre>
+python3 manuel_game.p # for manuel play
+</pre>
+
+
+
 
 **Windows CMD**
 <hr width="190px"  align="left">
 
 <pre>
-python pred.py 
+python snake_train.py # for training 
+</pre>
+<pre>
+python pred.py # for prediction 
+</pre>
+<pre>
+python3 manuel_game.p # for manuel play
+</pre>
+
+
+<p > Windows için manuel olarak oyun oynamak ve can sıkıntısını gidermek için ekstra bir .exe dosyası sisteme eklendi. Bu dosyayı GitHub'ın Releases sekmesinden indirebilir veya doğrudan bu bağlantıdan erişebilirsiniz. İyi oyunlar:-)
+
+</p>
+
+<i>An additional .exe file has been added to the system for manual gameplay on Windows and to alleviate boredom. You can download this file from the Releases tab on GitHub or directly from this link. Enjoy gaming :-) </i>
+<pre>
+https://github.com/yasin624/Reinforcement_Learning_SnakeGame/releases/download/snake_game/snake.exe
 </pre>
