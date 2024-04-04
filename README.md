@@ -100,15 +100,14 @@ Pekiştirmeli öğrenme algoritmalarında, algoritmanın optimizasyon fonksiyonl
 
 <br/>
 <div>  
-    <img src="./file/video/snake_vs1.gif"  width="50%" > </img>
-    <pre >
-
-    #on eating apple
-    if self.snake_head == self.apple_position:
-        reward=+10
-    if self.done:
-        reward=-10
-    </pre>
+<img src="./file/video/snake_vs1.gif"  width="50%" > </img>
+<pre>
+#on eating apple
+if self.snake_head == self.apple_position:
+    reward=+10
+if self.done:
+    reward=-10
+</pre>
 </div>
 
 <p > 
@@ -119,23 +118,23 @@ Reward değerinin optimizasyonu için ilk başta basitleştirilip daha sonraki e
 </i>
 
 <div>  
-    <img src="./file/video/snake_vs2.gif"  width="50%" > </img>
-    <pre >
-    <pre>
-    new_calculation=self.calculate_distance(self.snake_head, self.apple_position)
-    reward_scor=(self.score/self.total_aple)
-    reward_calculation=self.sigmoid(new_calculation)
-    reward_time=self.sigmoid(self.step_frame)
+<img src="./file/video/snake_vs2.gif"  width="50%" > </img>
 
-    reward_extra_apple=step_reward
+<pre >
+<pre>
+new_calculation=self.calculate_distance(self.snake_head, self.apple_position)
+reward_scor=(self.score/self.total_aple)
+reward_calculation=self.sigmoid(new_calculation)
+reward_time=self.sigmoid(self.step_frame)
 
-    step_total = reward_scor+reward_calculation+reward_time+step_reward
-    reward=step_total
-    <pre>
-    if self.done:
-        reward=-10
-        #(max snake body - snake body) 100
-    </pre></pre>
+reward_extra_apple=step_reward
+
+step_total = reward_scor+reward_calculation+reward_time+step_reward
+reward=step_total
+<pre>
+if self.done:
+    reward=-10
+</pre></pre>
 </div>
 
 <p > 
