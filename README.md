@@ -100,7 +100,7 @@ Pekiştirmeli öğrenme algoritmalarında, algoritmanın optimizasyon fonksiyonl
 
 <br/>
 <div>  
-<img src="./file/video/snake_vs1.gif"  width="50%" > </img>
+<img src="./file/video/snake_vs_1.gif"  width="50%" > </img>
 <pre>
 #on eating apple
 if self.snake_head == self.apple_position:
