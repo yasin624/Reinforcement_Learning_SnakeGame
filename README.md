@@ -7,7 +7,7 @@
 
 <div   height="600px">
 
-<a src="show/sunum_learning.mp4"><img src="./file/sanke.png"  width="49%"  height="100%" float=left> </img> </a>
+<img src="./file/video/main_snake.gif"  width="100%"  height="100%" float=left> </img> 
 
 <br/>
 
